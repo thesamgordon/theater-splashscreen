@@ -1,0 +1,108 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.screen,
+.inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: absolute;
+}
+
+.title {
+    font-size: 10rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0;
+    background: linear-gradient(to bottom, #fff, #444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle,
+.label {
+    font-size: 2rem;
+    color: #626262;
+    letter-spacing: 0.1em;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.startingSoon {
+    font-size: 10rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to bottom, #fff, #444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.digit {
+    background: linear-gradient(to bottom, #fff, #444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.clock {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    .minutesArea {
+        display: flex;
+        justify-content: flex-end;
+        min-width: 2ch;
+    }
+
+    .separator {
+        width: 1ch;
+        display: flex;
+        justify-content: center;
+    }
+
+    .secondsArea {
+        display: flex;
+        justify-content: flex-start;
+        width: 2ch;
+    }
+}
+
+.digitWrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1ch;
+    height: 24rem;
+
+    span {
+        position: absolute;
+        background: linear-gradient(to bottom, #fff, #444);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
+
+.separator {
+    width: 0ch;
+    display: flex;
+    justify-content: center;
+    background: linear-gradient(to bottom, #fff, #444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
