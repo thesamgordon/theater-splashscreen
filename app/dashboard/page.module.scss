@@ -76,7 +76,7 @@
         color: #fff;
         padding: 1rem;
         width: calc(100% - 2rem);
-        font-size: 1.0rem;
+        font-size: 1rem;
         font-family: var(--font-inter);
     }
 }
@@ -135,8 +135,10 @@
     cursor: pointer;
     width: 100%;
 
-    &:hover:not(.warn) {
-        background: #333;
+    @media (hover: hover) {
+        &:hover:not(.warn) {
+            background: #333;
+        }
     }
 
     &:active:not(.warn) {
@@ -146,8 +148,10 @@
     &.warn {
         border-color: #e11d4822;
 
-        &:hover {
-            background: #dc1842b4;
+        @media (hover: hover) {
+            &:hover {
+                background: #dc1842b4;
+            }
         }
 
         &:active {
@@ -161,7 +165,9 @@
     opacity: 0.5;
     pointer-events: none;
 
-    &:hover {
-        background: #111;
+    @media (hover: hover) {
+        &:hover {
+            background: #111;
+        }
     }
 }
