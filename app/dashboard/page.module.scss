@@ -156,6 +156,12 @@
     }
 }
 
-.nav {
-    font-weight: 900;
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+
+    &:hover {
+        background: #111;
+    }
 }

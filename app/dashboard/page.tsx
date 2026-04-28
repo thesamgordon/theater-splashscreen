@@ -42,8 +42,6 @@ export default function Dashboard() {
 
   return (
     <div className={styles.wrapper}>
-      <nav className={styles.nav}>Lobby Control</nav>
-
       <div className={styles.statusBar}>
         <div className={styles.top}>
           <div className={styles.statusItem}>
@@ -78,41 +76,47 @@ export default function Dashboard() {
         <h3>SCENE CONTROL</h3>
         <div className={styles.grid}>
           <button
-            className={styles.btn}
+            className={`${styles.btn} ${styles.warn} ${serverState.view == "splash" ? styles.disabled : ""}`}
             onClick={() => updateState({ view: "splash", timerActive: false })}
           >
             ACTIVATE SPLASH
           </button>
-          {serverState.view !== "intermission" && (
-            <button
-              className={`${styles.btn} ${styles.warn}`}
-              onClick={() =>
-                updateState({
-                  view: "intermission",
-                  timerActive: true,
-                  action: "set",
-                  value: 900,
-                })
-              }
-            >
-              START INTERMISSION
-            </button>
-          )}
-          {serverState.view === "intermission" && (
-            <button
-              className={`${styles.btn} ${styles.warn}`}
-              onClick={() =>
-                updateState({
-                  view: "intermission",
-                  timerActive: false,
-                  action: "set",
-                  value: 0,
-                })
-              }
-            >
-              END INTERMISSION
-            </button>
-          )}
+          <button
+            className={`${styles.btn} ${styles.warn} ${serverState.view == "live" ? styles.disabled : ""}`}
+            onClick={() =>
+              updateState({
+                view: "live",
+              })
+            }
+          >
+            GO LIVE
+          </button>
+          <button
+            className={`${styles.btn} ${styles.warn} ${serverState.view == "intermission" ? styles.disabled : ""}`}
+            onClick={() =>
+              updateState({
+                view: "intermission",
+                timerActive: true,
+                action: "set",
+                value: 900,
+              })
+            }
+          >
+            START INTERMISSION
+          </button>
+          <button
+            className={`${styles.btn} ${styles.warn} ${serverState.view != "intermission" ? styles.disabled : ""}`}
+            onClick={() =>
+              updateState({
+                view: "intermission",
+                timerActive: false,
+                action: "set",
+                value: 0,
+              })
+            }
+          >
+            END INTERMISSION
+          </button>
         </div>
         <div className={styles.input}>
           <input
@@ -128,7 +132,7 @@ export default function Dashboard() {
                 updateState({ action: "text", value: textInput });
               }}
             >
-              UPDATE TEXT
+              UPDATE SPLASH
             </button>
           </div>
         </div>

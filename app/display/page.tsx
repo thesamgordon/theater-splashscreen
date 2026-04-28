@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./page.module.scss";
+import styles from "./page.module.scss"
 
 const Digit = ({ value, id }: { value: string; id: string }) => (
   <div className={styles.digitWrapper}>
@@ -71,7 +71,7 @@ export default function LobbyDisplay() {
                 animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                 exit={{ y: "-20%", opacity: 0, filter: "blur(20px)" }}
                 transition={{ duration: 0.4, ease: [0.66, 0, 0.34, 1] }}
-                className={styles.subtitle}
+                className={styles.label}
               >
                 {data.text}
               </motion.p>
