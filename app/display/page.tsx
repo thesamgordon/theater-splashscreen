@@ -11,7 +11,7 @@ const Digit = ({ value, id }: { value: string; id: string }) => (
         initial={{ y: "20%", opacity: 0, filter: "blur(20px)" }}
         animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
         exit={{ y: "-20%", opacity: 0, filter: "blur(20px)" }}
-        transition={{ duration: 0.5, ease: [0.66, 0, 0.34, 1] }}
+        transition={{ duration: 0.4, ease: [0.66, 0, 0.34, 1] }}
         className={styles.digit}
       >
         {value}
@@ -21,7 +21,11 @@ const Digit = ({ value, id }: { value: string; id: string }) => (
 );
 
 export default function LobbyDisplay() {
-  const [data, setData] = useState({ view: "splash", timerActive: false, text: "THE SHOW WILL BEGIN SHORTLY" });
+  const [data, setData] = useState({
+    view: "splash",
+    timerActive: false,
+    text: "THE SHOW WILL BEGIN SHORTLY",
+  });
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
@@ -32,11 +36,9 @@ export default function LobbyDisplay() {
         setData(json);
         setSeconds(json.seconds);
       } catch (error) {
-        console.error(
-          error
-        )
+        console.error(error);
       }
-    }, 1000);
+    }, 200);
     return () => clearInterval(poll);
   }, []);
 
@@ -61,8 +63,19 @@ export default function LobbyDisplay() {
             exit={{ opacity: 0, filter: "blur(10px)" }}
             transition={{ duration: 1.2 }}
           >
-            <h1 className={styles.title}>The Addams Family</h1>
-            <p className={styles.subtitle}>{data.text}</p>
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.h1 className={styles.title}>The Addams Family</motion.h1>
+              <motion.p
+                key={data.text + "-subtitle"}
+                initial={{ y: "20%", opacity: 0, filter: "blur(20px)" }}
+                animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                exit={{ y: "-20%", opacity: 0, filter: "blur(20px)" }}
+                transition={{ duration: 0.4, ease: [0.66, 0, 0.34, 1] }}
+                className={styles.subtitle}
+              >
+                {data.text}
+              </motion.p>
+            </AnimatePresence>
           </motion.div>
         ) : (
           <motion.div

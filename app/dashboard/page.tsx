@@ -19,7 +19,7 @@ export default function Dashboard() {
         const json = await res.json();
         setServerState(json);
       } catch (e) {}
-    }, 1000);
+    }, 200);
     return () => clearInterval(poll);
   }, []);
 
@@ -66,7 +66,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        {(serverState.text && serverState.view == "splash" ) && (
+        {serverState.text && serverState.view == "splash" && (
           <div className={styles.statusItem}>
             <span>LOBBY TEXT: </span>
             <strong>{serverState.text}</strong>
@@ -119,16 +119,14 @@ export default function Dashboard() {
             type="text"
             placeholder="Custom lobby text"
             value={textInput}
-            onChange={(e) =>
-              setTextInput(e.target.value)
-            }
+            onChange={(e) => setTextInput(e.target.value)}
           />
           <div className={styles.submitBtn}>
             <button
               className={styles.btn}
-              onClick={() =>
-                updateState({ action: "text", value: textInput })
-              }
+              onClick={() => {
+                updateState({ action: "text", value: textInput });
+              }}
             >
               UPDATE TEXT
             </button>

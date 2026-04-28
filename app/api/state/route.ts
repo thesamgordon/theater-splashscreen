@@ -31,8 +31,12 @@ export async function POST(req: Request) {
     currentView = "intermission";
   } else if (body.action === "adjust") {
     if (endTimestamp) endTimestamp += body.value * 1000;
-  } else if (body.action === "text" && body.value) {
-    text = body.value;
+  } else if (body.action === "text") {
+    if (typeof body.value === "string") {
+      text = body.value;
+    } else {
+      text = "";
+    }
   } else {
     currentView = body.view;
     if (body.view === "splash") endTimestamp = null;
