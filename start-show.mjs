@@ -10,7 +10,6 @@ try {
     execSync(`ping -c 1 ${hostname}.lan`).toString();
 } catch (error) {
     dnsUrl = `http://${hostname}.local`;
-    console.error(`Error occurred while pinging ${hostname}.lan:`, error);
 }
 
 const lobbyUrl = `${dnsUrl}/display`;
