@@ -38,10 +38,9 @@ const Digit = ({
 
 export default function LobbyDisplay() {
   const [data, setData] = useState(getDefaultState());
-
   const [configuration, setConfiguration] = useState(getDefaultConfiguration());
-
   const [seconds, setSeconds] = useState(0);
+  const [lastChime, setLastChime] = useState(-1);
 
   useEffect(() => {
     const poll = setInterval(async () => {
@@ -50,25 +49,28 @@ export default function LobbyDisplay() {
         const json = await res.json();
         setData(json);
         setSeconds(json.seconds);
+
         if (json.config) {
           setConfiguration(json.config);
+        }
+
+        if (
+          json.shouldChime && lastChime !== json.seconds
+        ) {
+          const audio = new Audio("/chime.mp3");
+          audio.play();
+          setLastChime(json.seconds);
+
+          setTimeout(() => {
+            setLastChime(-1);
+          }, 1000);
         }
       } catch (error) {
         console.error(error);
       }
-    }, 500);
+    }, 200);
     return () => clearInterval(poll);
-  }, []);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (data.timerActive && seconds >= 0) {
-      timer = setInterval(() => setSeconds((s) => s - 1), 1000);
-    }
-
-    return () => clearInterval(timer);
-  }, [data.timerActive, seconds]);
+    }, [lastChime]);
 
   return (
     <div className={styles.container}>
@@ -83,7 +85,10 @@ export default function LobbyDisplay() {
             transition={{ duration: 1.2 }}
           >
             <AnimatePresence mode="popLayout" initial={false}>
-              <motion.h1 className={styles.title} style={{ color: configuration.primaryColor }}>
+              <motion.h1
+                className={styles.title}
+                style={{ color: configuration.primaryColor }}
+              >
                 {configuration.showName}
               </motion.h1>
               <motion.p
@@ -175,12 +180,22 @@ export default function LobbyDisplay() {
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   transition={{ duration: 1.2 }}
                 >
-                  <h2 className={styles.label} style={{
-                    color: configuration.secondaryColor
-                  }}>PLEASE TAKE YOUR SEATS</h2>
-                  <div className={styles.startingSoon} style={{
-                    color: configuration.primaryColor
-                  }}>STARTING SOON</div>
+                  <h2
+                    className={styles.label}
+                    style={{
+                      color: configuration.secondaryColor,
+                    }}
+                  >
+                    PLEASE TAKE YOUR SEATS
+                  </h2>
+                  <div
+                    className={styles.startingSoon}
+                    style={{
+                      color: configuration.primaryColor,
+                    }}
+                  >
+                    STARTING SOON
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

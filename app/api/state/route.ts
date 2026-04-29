@@ -9,6 +9,7 @@ import fs from "fs";
 import { getDefaultConfiguration } from "@/lib/types/data";
 
 const CONFIG_PATH = path.join(process.cwd(), "config.json");
+const CHIME_SECONDS = [0, 2 * 60, 5 * 60];
 
 let showConfig = getDefaultConfiguration();
 
@@ -23,12 +24,19 @@ export async function GET() {
     remaining = Math.max(-1, Math.round((endTimestamp - Date.now()) / 1000));
   }
 
-  return NextResponse.json({
+  const shouldChime =
+    CHIME_SECONDS.includes(remaining) &&
+    currentView === "intermission";
+
+  const responseData = {
     view: currentView,
     seconds: remaining,
     text,
     config: showConfig,
-  });
+    shouldChime: shouldChime,
+  };
+
+  return NextResponse.json(responseData);
 }
 
 export async function POST(req: Request) {
@@ -40,7 +48,7 @@ export async function POST(req: Request) {
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(showConfig, null, 2));
     return NextResponse.json({ success: true });
   } else if (body.action === "set" || body.view === "intermission") {
-    let secs = body.value || (showConfig.intermissionLength * 60);
+    let secs = body.value || showConfig.intermissionLength * 60;
     if (body.value === 0) {
       secs = 0;
     }
@@ -74,5 +82,10 @@ export async function POST(req: Request) {
     if (body.view === "splash") endTimestamp = null;
   }
 
-  return NextResponse.json({ view: currentView, seconds: 0, text });
+  return NextResponse.json({
+    view: currentView,
+    seconds: 0,
+    text,
+    shouldChime: false,
+  });
 }

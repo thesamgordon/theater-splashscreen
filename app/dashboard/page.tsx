@@ -30,7 +30,9 @@ export default function Dashboard() {
           setHasSetConfig(true);
         }
       }
-    } catch (e) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -71,7 +73,9 @@ export default function Dashboard() {
   return (
     <div className={styles.fullWrapper}>
       <div className={styles.header}>
-        <div className={`${styles.statusItem} ${styles.right} ${hasSetConfig ? "" : styles.loading}`}>
+        <div
+          className={`${styles.statusItem} ${styles.right} ${hasSetConfig ? "" : styles.loading}`}
+        >
           <span>CURRENT VIEW</span>
           <strong
             className={
@@ -92,7 +96,20 @@ export default function Dashboard() {
         )}
 
         <div className={styles.statusContainer}>
-          <span>CONNECTION STATUS</span>
+          <span>
+            {" "}
+            {now.getTime() - lastUpdated.getTime() > 1000 ? (
+              <span className={styles.secondaryText}>
+                Last updated{" "}
+                {lastUpdated &&
+                Math.max(now.getTime() - lastUpdated.getTime(), 0) < 1000
+                  ? "just now."
+                  : `${Math.floor((now.getTime() - lastUpdated.getTime()) / 1000)}s ago`}
+              </span>
+            ) : (
+              "CONNECTION STATUS"
+            )}
+          </span>
 
           <span
             className={`${
@@ -105,15 +122,6 @@ export default function Dashboard() {
               ? "CONNECTED"
               : "DISCONNECTED"}
           </span>
-          {now.getTime() - lastUpdated.getTime() > 1000 && (
-            <span className={styles.secondaryText}>
-              Last updated{" "}
-              {lastUpdated &&
-              Math.max(now.getTime() - lastUpdated.getTime(), 0) < 1000
-                ? "just now."
-                : `${Math.floor((now.getTime() - lastUpdated.getTime()) / 1000)}s ago`}
-            </span>
-          )}
         </div>
       </div>
 
@@ -150,7 +158,9 @@ export default function Dashboard() {
                 })
               }
             >
-              {serverState.view === "intermission" ? "RESTART INTERMISSION" : "START INTERMISSION"}
+              {serverState.view === "intermission"
+                ? "RESTART INTERMISSION"
+                : "START INTERMISSION"}
             </button>
             <button
               className={`${styles.btn} ${styles.warn} ${serverState.view != "intermission" || serverState.seconds <= 0 ? styles.disabled : ""}`}
@@ -232,6 +242,8 @@ export default function Dashboard() {
               <input
                 type="number"
                 placeholder="15"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={customTime}
                 onChange={(e) => setCustomTime(parseInt(e.target.value))}
                 onKeyDown={(e) => {
@@ -283,6 +295,8 @@ export default function Dashboard() {
               <label>Intermission Length (minutes)</label>
               <input
                 type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={configuration.intermissionLength}
                 onFocus={() => setInputFocus(true)}
                 onBlur={() => setInputFocus(false)}
