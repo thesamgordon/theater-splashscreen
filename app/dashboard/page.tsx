@@ -1,16 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import styles from "./page.module.scss";
+import { getDefaultConfiguration, getDefaultState } from "@/lib/types/data";
 
 export default function Dashboard() {
   const [customTime, setCustomTime] = useState(15);
-  const [serverState, setServerState] = useState({
-    view: "splash",
-    seconds: 0,
-    text: "THE SHOW WILL BEGIN SHORTLY",
-  });
+  const [serverState, setServerState] = useState(getDefaultState());
 
-  const [textInput, setTextInput] = useState("THE SHOW WILL BEGIN SHORTLY");
+  const [configuration, setConfiguration] = useState(getDefaultConfiguration());
+  const [inputFocus, setInputFocus] = useState(false);
+
+  const [textInput, setTextInput] = useState("");
+  const [hasSetConfig, setHasSetConfig] = useState(false);
 
   useEffect(() => {
     const poll = setInterval(async () => {
@@ -18,10 +19,19 @@ export default function Dashboard() {
         const res = await fetch("/api/state");
         const json = await res.json();
         setServerState(json);
+
+        if (json.config && !inputFocus) {
+          setConfiguration(json.config);
+
+          if (!hasSetConfig) {
+            setTextInput(json.config.splash);
+            setHasSetConfig(true);
+          }
+        }
       } catch (e) {}
-    }, 200);
+    }, 500);
     return () => clearInterval(poll);
-  }, []);
+  }, [inputFocus, hasSetConfig]);
 
   const updateState = (payload: object) => {
     fetch("/api/state", {
@@ -45,7 +55,7 @@ export default function Dashboard() {
       <div className={styles.statusBar}>
         <div className={styles.top}>
           <div className={styles.statusItem}>
-            <span>VIEW: </span>
+            <span>CURRENT VIEW</span>
             <strong
               className={
                 serverState.view === "intermission" ? styles.activeText : ""
@@ -55,25 +65,18 @@ export default function Dashboard() {
             </strong>
           </div>
           {serverState.view === "intermission" && (
-            <div className={styles.statusItem}>
-              <span>LOBBY CLOCK: </span>
+            <div className={`${styles.statusItem} ${styles.timer}`}>
+              <span>LOBBY CLOCK</span>
               <strong className={styles.clockText}>
                 {formatTime(serverState.seconds)}
               </strong>
             </div>
           )}
         </div>
-
-        {serverState.text && serverState.view == "splash" && (
-          <div className={styles.statusItem}>
-            <span>LOBBY TEXT: </span>
-            <strong>{serverState.text}</strong>
-          </div>
-        )}
       </div>
 
       <div className={styles.section}>
-        <h3>SCENE CONTROL</h3>
+        <h3>Scene Control</h3>
         <div className={styles.grid}>
           <button
             className={`${styles.btn} ${styles.warn} ${serverState.view == "splash" ? styles.disabled : ""}`}
@@ -98,7 +101,7 @@ export default function Dashboard() {
                 view: "intermission",
                 timerActive: true,
                 action: "set",
-                value: 900,
+                value: configuration.intermissionLength * 60,
               })
             }
           >
@@ -122,24 +125,33 @@ export default function Dashboard() {
           <input
             type="text"
             placeholder="Custom lobby text"
+            onFocus={() => setInputFocus(true)}
+            onBlur={() => setInputFocus(false)}
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
           />
-          <div className={styles.submitBtn}>
+          <div>
             <button
-              className={styles.btn}
+              className={`${styles.btn} ${styles.submitBtn}`}
               onClick={() => {
-                updateState({ action: "text", value: textInput });
+                setConfiguration({
+                  ...configuration,
+                  splash: textInput,
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { splash: textInput },
+                });
               }}
             >
-              UPDATE SPLASH
+              SET SPLASH
             </button>
           </div>
         </div>
       </div>
 
       <div className={styles.section}>
-        <h3>TIMER CONTROL</h3>
+        <h3>Timer Control</h3>
         <div className={styles.timerControls}>
           <div className={styles.adjustButtons}>
             <button
@@ -156,21 +168,108 @@ export default function Dashboard() {
             </button>
           </div>
 
-          <div className={styles.customSet}>
+          <div className={styles.input}>
             <input
               type="number"
+              placeholder="15"
               value={customTime}
               onChange={(e) => setCustomTime(parseInt(e.target.value))}
             />
-            <button
-              className={styles.btn}
-              onClick={() =>
-                updateState({ action: "set", value: customTime * 60 })
-              }
-            >
-              SET MINUTES
-            </button>
+            <div>
+              <button
+                className={`${styles.btn} ${styles.submitBtn}`}
+                onClick={() => {
+                  updateState({ action: "set", value: customTime * 60 });
+                }}
+              >
+                SET TIME
+              </button>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <h3>Show Configuration</h3>
+        <div className={styles.flex}>
+          <div className={styles.configItem}>
+            <label>Show Name</label>
+            <input
+              type="text"
+              value={configuration.showName}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              onChange={(e) => {
+                setConfiguration({
+                  ...configuration,
+                  showName: e.target.value,
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { showName: e.target.value },
+                });
+              }}
+            />
+          </div>
+          <div className={styles.configItem}>
+            <label>Intermission Length (minutes)</label>
+            <input
+              type="number"
+              value={configuration.intermissionLength}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              onChange={(e) => {
+                setConfiguration({
+                  ...configuration,
+                  intermissionLength: parseInt(e.target.value),
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { intermissionLength: parseInt(e.target.value) },
+                });
+              }}
+            />
+          </div>
+          <div className={styles.configItem}>
+            <label>Primary Color</label>
+            <input
+              type="color"
+              value={configuration.primaryColor}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              className={styles.colorInput}
+              onChange={(e) => {
+                setConfiguration({
+                  ...configuration,
+                  primaryColor: e.target.value,
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { primaryColor: e.target.value },
+                });
+              }}
+            />
+          </div>
+        </div>
+        <div className={styles.configItem}>
+          <label>Secondary Color</label>
+          <input
+            type="color"
+            value={configuration.secondaryColor}
+            onFocus={() => setInputFocus(true)}
+            onBlur={() => setInputFocus(false)}
+            className={styles.colorInput}
+            onChange={(e) => {
+              setConfiguration({
+                ...configuration,
+                secondaryColor: e.target.value,
+              });
+              updateState({
+                action: "updateConfig",
+                value: { secondaryColor: e.target.value },
+              });
+            }}
+          />
         </div>
       </div>
     </div>

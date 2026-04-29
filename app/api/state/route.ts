@@ -4,6 +4,17 @@ let endTimestamp: number | null = null;
 let currentView = "splash";
 let text = "THE SHOW WILL BEGIN SHORTLY";
 import { getObsConnection } from "@/lib/obs";
+import path from "path";
+import fs from "fs";
+import { getDefaultConfiguration } from "@/lib/types/data";
+
+const CONFIG_PATH = path.join(process.cwd(), "config.json");
+
+let showConfig = getDefaultConfiguration();
+
+if (fs.existsSync(CONFIG_PATH)) {
+  showConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf-8"));
+}
 
 export async function GET() {
   let remaining = 0;
@@ -16,6 +27,7 @@ export async function GET() {
     view: currentView,
     seconds: remaining,
     text,
+    config: showConfig,
   });
 }
 
@@ -23,8 +35,12 @@ export async function POST(req: Request) {
   const body = await req.json();
   const obs = await getObsConnection();
 
-  if (body.action === "set" || body.view === "intermission") {
-    let secs = body.value || 900;
+  if (body.action === "updateConfig") {
+    showConfig = { ...showConfig, ...body.value };
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(showConfig, null, 2));
+    return NextResponse.json({ success: true });
+  } else if (body.action === "set" || body.view === "intermission") {
+    let secs = body.value || (showConfig.intermissionLength * 60);
     if (body.value === 0) {
       secs = 0;
     }
@@ -53,7 +69,7 @@ export async function POST(req: Request) {
     if (obs.identified) {
       await obs.call("SetCurrentProgramScene", { sceneName: "Browser View" });
     }
-    
+
     currentView = body.view;
     if (body.view === "splash") endTimestamp = null;
   }

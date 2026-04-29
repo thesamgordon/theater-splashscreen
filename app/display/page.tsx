@@ -1,13 +1,29 @@
 "use client";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import styles from "./page.module.scss"
+import styles from "./page.module.scss";
+import {
+  Configuration,
+  getDefaultConfiguration,
+  getDefaultState,
+} from "@/lib/types/data";
 
-const Digit = ({ value, id }: { value: string; id: string }) => (
+const Digit = ({
+  value,
+  id,
+  configuration,
+}: {
+  value: string;
+  id: string;
+  configuration: Configuration;
+}) => (
   <div className={styles.digitWrapper}>
     <AnimatePresence mode="popLayout" initial={false}>
       <motion.span
         key={`${id}-${value}`}
+        style={{
+          color: configuration.primaryColor,
+        }}
         initial={{ y: "20%", opacity: 0, filter: "blur(20px)" }}
         animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
         exit={{ y: "-20%", opacity: 0, filter: "blur(20px)" }}
@@ -21,12 +37,13 @@ const Digit = ({ value, id }: { value: string; id: string }) => (
 );
 
 export default function LobbyDisplay() {
-  const [data, setData] = useState({
-    view: "splash",
-    timerActive: false,
-    text: "THE SHOW WILL BEGIN SHORTLY",
-  });
+  const [data, setData] = useState(getDefaultState());
+
+  const [configuration, setConfiguration] = useState(getDefaultConfiguration());
+
   const [seconds, setSeconds] = useState(0);
+
+  const [hasSetConfig, setHasSetConfig] = useState(false);
 
   useEffect(() => {
     const poll = setInterval(async () => {
@@ -35,12 +52,16 @@ export default function LobbyDisplay() {
         const json = await res.json();
         setData(json);
         setSeconds(json.seconds);
+        if (json.config && !hasSetConfig) {
+          setConfiguration(json.config);
+          setHasSetConfig(true);
+        }
       } catch (error) {
         console.error(error);
       }
-    }, 200);
+    }, 500);
     return () => clearInterval(poll);
-  }, []);
+  }, [hasSetConfig]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -48,6 +69,7 @@ export default function LobbyDisplay() {
     if (data.timerActive && seconds >= 0) {
       timer = setInterval(() => setSeconds((s) => s - 1), 1000);
     }
+
     return () => clearInterval(timer);
   }, [data.timerActive, seconds]);
 
@@ -64,16 +86,19 @@ export default function LobbyDisplay() {
             transition={{ duration: 1.2 }}
           >
             <AnimatePresence mode="popLayout" initial={false}>
-              <motion.h1 className={styles.title}>The Addams Family</motion.h1>
+              <motion.h1 className={styles.title} style={{ color: configuration.primaryColor }}>
+                {configuration.showName}
+              </motion.h1>
               <motion.p
-                key={data.text + "-subtitle"}
+                key={configuration.splash + "-subtitle"}
                 initial={{ y: "20%", opacity: 0, filter: "blur(20px)" }}
                 animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
                 exit={{ y: "-20%", opacity: 0, filter: "blur(20px)" }}
                 transition={{ duration: 0.4, ease: [0.66, 0, 0.34, 1] }}
                 className={styles.label}
+                style={{ color: configuration.secondaryColor }}
               >
-                {data.text}
+                {configuration.splash}
               </motion.p>
             </AnimatePresence>
           </motion.div>
@@ -95,7 +120,14 @@ export default function LobbyDisplay() {
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   transition={{ duration: 1.2 }}
                 >
-                  <h2 className={styles.label}>INTERMISSION</h2>
+                  <h2
+                    className={styles.label}
+                    style={{
+                      color: configuration.secondaryColor,
+                    }}
+                  >
+                    INTERMISSION
+                  </h2>
                   <div className={styles.clock}>
                     <div className={styles.minutesArea}>
                       {Math.floor(seconds / 60)
@@ -107,11 +139,19 @@ export default function LobbyDisplay() {
                             key={`min-${i}`}
                             id={`min-${i}`}
                             value={char}
+                            configuration={configuration}
                           />
                         ))}
                     </div>
 
-                    <div className={styles.separator}>:</div>
+                    <div
+                      className={styles.separator}
+                      style={{
+                        color: configuration.primaryColor,
+                      }}
+                    >
+                      :
+                    </div>
 
                     <div className={styles.secondsArea}>
                       {(seconds % 60)
@@ -123,6 +163,7 @@ export default function LobbyDisplay() {
                             key={`sec-${i}`}
                             id={`sec-${i}`}
                             value={char}
+                            configuration={configuration}
                           />
                         ))}
                     </div>
@@ -137,8 +178,12 @@ export default function LobbyDisplay() {
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   transition={{ duration: 1.2 }}
                 >
-                  <h2 className={styles.label}>PLEASE TAKE YOUR SEATS</h2>
-                  <div className={styles.startingSoon}>STARTING SOON</div>
+                  <h2 className={styles.label} style={{
+                    color: configuration.secondaryColor
+                  }}>PLEASE TAKE YOUR SEATS</h2>
+                  <div className={styles.startingSoon} style={{
+                    color: configuration.primaryColor
+                  }}>STARTING SOON</div>
                 </motion.div>
               )}
             </AnimatePresence>
