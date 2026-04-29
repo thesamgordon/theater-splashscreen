@@ -4,7 +4,14 @@ import fs from 'fs';
 import path from 'path';
 
 const hostname = os.hostname().split('.')[0].toLowerCase();
-const dnsUrl = `http://${hostname}.lan`;
+let dnsUrl = `http://${hostname}.lan`;
+
+try {
+    execSync(`ping -c 1 ${hostname}.lan`).toString();
+} catch (error) {
+    dnsUrl = `http://${hostname}.local`;
+    console.error(`Error occurred while pinging ${hostname}.lan:`, error);
+}
 
 const lobbyUrl = `${dnsUrl}/display`;
 const dashboardUrl = `${dnsUrl}/dashboard`;
@@ -17,7 +24,6 @@ if (!fs.existsSync(buildPath)) {
     execSync('npm run build', { stdio: 'inherit' });
 }
 
-const labelWidth = 16;
 
 const RESET = "\x1b[0m";
 const BOLD = "\x1b[1m";
@@ -27,18 +33,28 @@ const GRAY = "\x1b[90m";
 const GREEN = "\x1b[32m";
 const RED = "\x1b[31m";
 
-console.clear();
-console.log(`${BLUE}╔═══════════════════════════════════════════════════╗${RESET}`);
-console.log(`${BLUE}║${RESET}               ${BOLD}${WHITE}LOBBY CONTROL SYSTEM${RESET}                ${BLUE}║${RESET}`);
-console.log(`${BLUE}╠═══════════════════════════════════════════════════╣${RESET}`);
-console.log(`${BLUE}║${RESET}                                                   ${BLUE}║${RESET}`);
-console.log(`${BLUE}║${RESET}  ${BOLD}${"Display URL:".padEnd(labelWidth)}${RESET} ${RED}${lobbyUrl.padEnd(31)}${RESET}${BLUE} ║${RESET}`);
-console.log(`${BLUE}║${RESET}  ${BOLD}${"Remote URL:".padEnd(labelWidth)}${RESET} ${RED}${dashboardUrl.padEnd(31)}${RESET}${BLUE} ║${RESET}`);
-console.log(`${BLUE}║${RESET}                                                   ${BLUE}║${RESET}`);
-console.log(`${BLUE}╠═══════════════════════════════════════════════════╣${RESET}`);
-console.log(`${BLUE}║${RESET}  ${GREEN}● SYSTEM ONLINE${RESET}                                  ${BLUE}║${RESET}`);
-console.log(`${BLUE}║${RESET}  ${GRAY}Press Ctrl+C to terminate session                ${BLUE}║${RESET}`);
-console.log(`${BLUE}╚═══════════════════════════════════════════════════╝${RESET}\n`);
+const labelWidth = 14;
+const totalInnerWidth = 54;
+
+const stripAnsi = (str) => str.replace(/\x1b\[[0-9;]*m/g, '');
+
+const formatLine = (content) => {
+  const visibleLength = stripAnsi(content).length;
+  const paddingNeeded = Math.max(0, totalInnerWidth - visibleLength);
+  return `${BLUE}║${RESET} ${content}${' '.repeat(paddingNeeded)} ${BLUE}║${RESET}`;
+};
+
+console.log(`${BLUE}╔════════════════════════════════════════════════════════╗${RESET}`);
+console.log(formatLine(`              ${BOLD}${WHITE}MHS LOBBY CONTROL SYSTEM${RESET}   `));
+console.log(`${BLUE}╠════════════════════════════════════════════════════════╣${RESET}`);
+console.log(formatLine("")); 
+console.log(formatLine(` ${BOLD}${"Display URL:".padEnd(labelWidth)}${RESET} ${RED}${lobbyUrl}${RESET}`));
+console.log(formatLine(` ${BOLD}${"Remote URL:".padEnd(labelWidth)}${RESET} ${RED}${dashboardUrl}${RESET}`));
+console.log(formatLine(""));
+console.log(`${BLUE}╠════════════════════════════════════════════════════════╣${RESET}`);
+console.log(formatLine(` ${GREEN}● SYSTEM ONLINE${RESET}`));
+console.log(formatLine(` ${GRAY}Press Ctrl+C to terminate session${RESET}`));
+console.log(`${BLUE}╚════════════════════════════════════════════════════════╝${RESET}\n`);
 
 const server = spawn('npx next start -H 0.0.0.0 -p 80', {
     shell: true

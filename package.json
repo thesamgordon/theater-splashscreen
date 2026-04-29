@@ -1,5 +1,9 @@
 {
-  "name": "mhs-splashscreen",
+  "name": "theater-splashscreen",
+  "author": {
+    "name": "Sam Gordon",
+    "email": "sam@thesamgordon.com"
+  },
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,7 +27,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "sass": "^1.99.0",
-    "tailwindcss": "^4",
     "typescript": "^5"
   },
   "ignoreScripts": [

@@ -125,6 +125,21 @@ export default function Dashboard() {
           <input
             type="text"
             placeholder="Custom lobby text"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setConfiguration({
+                  ...configuration,
+                  splash: textInput,
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { splash: textInput },
+                });
+
+                setInputFocus(false);
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
             onFocus={() => setInputFocus(true)}
             onBlur={() => setInputFocus(false)}
             value={textInput}
@@ -174,6 +189,14 @@ export default function Dashboard() {
               placeholder="15"
               value={customTime}
               onChange={(e) => setCustomTime(parseInt(e.target.value))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  updateState({ action: "set", value: customTime * 60 });
+
+                  setInputFocus(false);
+                  (e.target as HTMLInputElement).blur();
+                }
+              }}
             />
             <div>
               <button
