@@ -47,13 +47,15 @@ export default function Dashboard() {
     }, 500);
 
     return () => clearInterval(poll);
-  }, []);
+  }, [hasSetConfig, inputFocus]);
 
   const updateState = (payload: object) => {
     fetch("/api/state", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+    }).then(() => {
+      fetchData();
     });
   };
 
@@ -138,7 +140,7 @@ export default function Dashboard() {
               GO LIVE
             </button>
             <button
-              className={`${styles.btn} ${styles.warn} ${serverState.view == "intermission" ? styles.disabled : ""}`}
+              className={`${styles.btn} ${styles.warn}`}
               onClick={() =>
                 updateState({
                   view: "intermission",
@@ -148,10 +150,10 @@ export default function Dashboard() {
                 })
               }
             >
-              START INTERMISSION
+              {serverState.view === "intermission" ? "RESTART INTERMISSION" : "START INTERMISSION"}
             </button>
             <button
-              className={`${styles.btn} ${styles.warn} ${serverState.view != "intermission" ? styles.disabled : ""}`}
+              className={`${styles.btn} ${styles.warn} ${serverState.view != "intermission" || serverState.seconds <= 0 ? styles.disabled : ""}`}
               onClick={() =>
                 updateState({
                   view: "intermission",
