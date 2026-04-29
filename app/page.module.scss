@@ -46,6 +46,10 @@
 }
 
 @media (max-width: 600px) {
+    .wrapper {
+        padding: 1.5rem;
+    }
+
     .title {
         font-size: 2rem;
     }
