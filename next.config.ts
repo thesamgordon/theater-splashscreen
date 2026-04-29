@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 };
 
 module.exports = {
-  allowedDevOrigins: ["*.local", "*.lan"],
+  allowedDevOrigins: ["*.local", "*.lan", "lobby"],
 };
 
 export default nextConfig;

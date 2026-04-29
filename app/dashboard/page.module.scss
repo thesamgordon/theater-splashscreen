@@ -2,7 +2,7 @@
     min-height: calc(100vh - 4rem);
     background: #0a0a0a;
     color: #fff;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 .statusBar {
@@ -11,7 +11,7 @@
     gap: 1rem;
     background: #111;
     border: 1px solid #222;
-    padding: .5rem;
+    padding: 0.5rem;
     margin-bottom: 3rem;
 
     .top {
@@ -65,7 +65,7 @@
 }
 
 .input {
-    margin-top: .5rem;
+    margin-top: 0.5rem;
     display: flex;
     gap: 0.5rem;
 
@@ -83,7 +83,7 @@
         width: 100%;
 
         &:focus-visible {
-            border-color: #e11d48;
+            border-color: #434343;
             outline: none;
         }
     }
@@ -202,7 +202,7 @@
         font-size: 1rem;
 
         &:focus-visible {
-            border-color: #e11d48;
+            border-color: #434343;
             outline: none;
         }
     }
