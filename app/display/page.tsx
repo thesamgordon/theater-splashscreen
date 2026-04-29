@@ -43,8 +43,6 @@ export default function LobbyDisplay() {
 
   const [seconds, setSeconds] = useState(0);
 
-  const [hasSetConfig, setHasSetConfig] = useState(false);
-
   useEffect(() => {
     const poll = setInterval(async () => {
       try {
@@ -52,16 +50,15 @@ export default function LobbyDisplay() {
         const json = await res.json();
         setData(json);
         setSeconds(json.seconds);
-        if (json.config && !hasSetConfig) {
+        if (json.config) {
           setConfiguration(json.config);
-          setHasSetConfig(true);
         }
       } catch (error) {
         console.error(error);
       }
     }, 500);
     return () => clearInterval(poll);
-  }, [hasSetConfig]);
+  }, []);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
