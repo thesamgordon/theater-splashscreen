@@ -250,26 +250,26 @@ export default function Dashboard() {
               }}
             />
           </div>
-        </div>
-        <div className={styles.configItem}>
-          <label>Secondary Color</label>
-          <input
-            type="color"
-            value={configuration.secondaryColor}
-            onFocus={() => setInputFocus(true)}
-            onBlur={() => setInputFocus(false)}
-            className={styles.colorInput}
-            onChange={(e) => {
-              setConfiguration({
-                ...configuration,
-                secondaryColor: e.target.value,
-              });
-              updateState({
-                action: "updateConfig",
-                value: { secondaryColor: e.target.value },
-              });
-            }}
-          />
+          <div className={styles.configItem}>
+            <label>Secondary Color</label>
+            <input
+              type="color"
+              value={configuration.secondaryColor}
+              onFocus={() => setInputFocus(true)}
+              onBlur={() => setInputFocus(false)}
+              className={styles.colorInput}
+              onChange={(e) => {
+                setConfiguration({
+                  ...configuration,
+                  secondaryColor: e.target.value,
+                });
+                updateState({
+                  action: "updateConfig",
+                  value: { secondaryColor: e.target.value },
+                });
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>
