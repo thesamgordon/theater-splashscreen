@@ -70,6 +70,8 @@ export default function Dashboard() {
     return `${m}:${sec}`;
   };
 
+  const isConnected = now.getTime() - lastUpdated.getTime() < 1000;
+
   return (
     <div className={styles.fullWrapper}>
       <div className={styles.header}>
@@ -98,11 +100,10 @@ export default function Dashboard() {
         <div className={styles.statusContainer}>
           <span>
             {" "}
-            {now.getTime() - lastUpdated.getTime() > 1000 ? (
+            {!isConnected ? (
               <span className={styles.secondaryText}>
                 Last updated{" "}
-                {lastUpdated &&
-                Math.max(now.getTime() - lastUpdated.getTime(), 0) < 1000
+                {lastUpdated && isConnected
                   ? "just now."
                   : `${Math.floor((now.getTime() - lastUpdated.getTime()) / 1000)}s ago`}
               </span>
@@ -113,19 +114,22 @@ export default function Dashboard() {
 
           <span
             className={`${
-              now.getTime() - lastUpdated.getTime() < 1000
+              isConnected
                 ? styles.connectionText
                 : styles.disconnectedText
             }`}
           >
-            {now.getTime() - lastUpdated.getTime() < 1000
+            {isConnected
               ? "CONNECTED"
               : "DISCONNECTED"}
           </span>
         </div>
       </div>
 
-      <div className={styles.wrapper}>
+      <div className={styles.wrapper} style={{
+        opacity: isConnected ? 1: 0.5,
+        pointerEvents: isConnected ? "unset" : "none"
+      }}>
         <div className={styles.section}>
           <h3>Scene Control</h3>
           <div className={styles.grid}>
