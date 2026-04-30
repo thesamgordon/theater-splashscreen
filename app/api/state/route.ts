@@ -66,7 +66,9 @@ export async function POST(req: Request) {
 
     currentView = "live";
   } else if (body.action === "adjust") {
-    if (endTimestamp) endTimestamp += body.value * 1000;
+    if (endTimestamp) {
+      endTimestamp = Math.max(endTimestamp, Date.now()) + body.value * 1000;
+    }
   } else if (body.action === "text") {
     if (typeof body.value === "string") {
       text = body.value;
