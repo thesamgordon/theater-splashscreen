@@ -5,7 +5,9 @@ import path from 'path';
 import OBSWebSocket from 'obs-websocket-js';
 import env from 'dotenv';
 
-env.config();
+env.config({
+    quiet: true,
+});
 
 const hostname = os.hostname().split('.')[0].toLowerCase();
 let dnsUrl = `http://${hostname}.local`;
