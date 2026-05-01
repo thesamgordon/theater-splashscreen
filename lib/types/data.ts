@@ -21,9 +21,9 @@ export const getDefaultState = (): State => ({
 });
 
 export const getDefaultConfiguration = (): Configuration => ({
-  showName: "The Addams Family",
+  showName: "",
   intermissionLength: 15,
-  primaryColor: "#FFF",
-  secondaryColor: "#FFF",
-  splash: "THE SHOW WILL BEGIN SHORTLY",
+  primaryColor: "transparent",
+  secondaryColor: "transparent",
+  splash: "",
 });

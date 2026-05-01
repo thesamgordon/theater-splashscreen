@@ -42,40 +42,46 @@ export default function LobbyDisplay() {
   const [seconds, setSeconds] = useState(0);
   const [lastChime, setLastChime] = useState(-1);
 
-  useEffect(() => {
-    const poll = setInterval(async () => {
-      try {
-        const res = await fetch("/api/state");
-        const json = await res.json();
-        setData(json);
-        setSeconds(json.seconds);
+  const fetchData = async () => {
+    try {
+      const res = await fetch("/api/state");
+      const json = await res.json();
+      setData(json);
+      setSeconds(json.seconds);
 
-        if (json.config) {
-          setConfiguration(json.config);
-        }
-
-        if (
-          json.shouldChime && lastChime !== json.seconds
-        ) {
-          const audio = new Audio("/chime.mp3");
-          audio.play();
-          setLastChime(json.seconds);
-
-          setTimeout(() => {
-            setLastChime(-1);
-          }, 1000);
-        }
-      } catch (error) {
-        console.error(error);
+      if (json.config) {
+        setConfiguration(json.config);
       }
+
+      if (json.shouldChime && lastChime !== json.seconds) {
+        const audio = new Audio("/chime.mp3");
+        audio.play();
+        setLastChime(json.seconds);
+
+        setTimeout(() => {
+          setLastChime(-1);
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    queueMicrotask(async () => {
+      await fetchData();
+    });
+
+    const poll = setInterval(async () => {
+      await fetchData();
     }, 200);
     return () => clearInterval(poll);
-    }, [lastChime]);
+  }, [lastChime]);
 
   return (
     <div className={styles.container}>
       <AnimatePresence mode="wait">
-        {data.view === "splash" ? (
+        {data.view === "splash" && configuration.showName ? (
           <motion.div
             key="splash"
             className={styles.screen}
@@ -113,7 +119,7 @@ export default function LobbyDisplay() {
             exit={{ opacity: 0 }}
           >
             <AnimatePresence mode="wait">
-              {seconds >= 0 ? (
+              {seconds >= 0 && configuration.showName ? (
                 <motion.div
                   key="intermission"
                   className={styles.screen}
