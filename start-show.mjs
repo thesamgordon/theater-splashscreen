@@ -9,6 +9,44 @@ env.config({
     quiet: true,
 });
 
+
+const RESET = "\x1b[0m";
+const BOLD = "\x1b[1m";
+const BLUE = "\x1b[34m";
+const WHITE = "\x1b[37m";
+const GRAY = "\x1b[90m";
+const GREEN = "\x1b[32m";
+const RED = "\x1b[31m";
+const YELLOW = "\x1b[33m";
+
+try {
+    const portCheck = execSync('lsof -i :80 -sTCP:LISTEN').toString();
+
+    if (portCheck) {
+        console.clear();
+        console.log(`${BOLD}${RED}PORT 80 CONFLICT${RESET}`);
+        console.log(`${GRAY}Check if another lobby control terminal window is already open.\n`);
+
+        const lines = portCheck.trim().split('\n');
+        const processInfo = (lines[1] || "Unknown Process").replace(/\\x20/g, ' ').trim();
+        const pid = processInfo.split(/\s+/)[1] || "Unknown PID";
+
+        console.log(`${BOLD}${YELLOW}CURRENTLY BLOCKING PORT 80:${RESET}`);
+        console.log(`${RED}» ${processInfo}${RESET}\n`);
+
+        console.log(`${WHITE}${BOLD}To force kill the blocking process, run the following in a new terminal:${RESET}`);
+        console.log(`${RED}sudo kill -9 ${pid}${RESET}`);
+
+        console.log(`${GRAY}${"─".repeat(66)}${RESET}`);
+
+        process.exit(1);
+    }
+} catch (e) {
+    console.log(e)
+
+
+}
+
 const hostname = os.hostname().split('.')[0].toLowerCase();
 let dnsUrl = `http://${hostname}.local`;
 
@@ -53,15 +91,6 @@ if (shouldRebuild()) {
     console.log("Changes detected or no build found. Rebuilding...");
     execSync('npm run build', { stdio: 'inherit' });
 }
-
-
-const RESET = "\x1b[0m";
-const BOLD = "\x1b[1m";
-const BLUE = "\x1b[34m";
-const WHITE = "\x1b[37m";
-const GRAY = "\x1b[90m";
-const GREEN = "\x1b[32m";
-const RED = "\x1b[31m";
 
 const labelWidth = 14;
 const totalInnerWidth = 54;
